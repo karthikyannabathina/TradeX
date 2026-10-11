@@ -289,13 +289,25 @@ Interactive Swagger docs are available on the running backend. Example endpoints
 
 ---
 
-## 👨‍💻 Author
+👨‍💻 Author & 📫 Connect With Me
 
-**Karthik Yannabathina**
-Full Stack Developer (MERN), final-year B.Tech CSE student.
+## 👨‍💻 Author & 📫 Connect With Me
 
-- GitHub: [@karthikyannabathina](https://github.com/karthikyannabathina)
-- LinkedIn: [add your LinkedIn URL here](https://www.linkedin.com/in/your-profile)
-- Email: your-email@example.com
+**Karthik Yannabathina**  
+Full Stack Developer (MERN) | Final-Year B.Tech CSE Student
+
+<p align="center">
+  <a href="https://www.linkedin.com/in/karthik-yannabathina/">
+    <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin" alt="LinkedIn" />
+  </a>
+  <a href="mailto:karthikyannabathina4444@gmail.com">
+    <img src="https://img.shields.io/badge/Gmail-Contact-red?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+  <a href="https://karthikyannabathina-portfolio.vercel.app/">
+    <img src="https://img.shields.io/badge/Portfolio-Visit-black?style=for-the-badge&logo=vercel" alt="Portfolio" />
+  </a>
+</p>
+
+
 
 ⭐ If you found TradeX interesting, consider starring the repo.
