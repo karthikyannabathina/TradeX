@@ -10,6 +10,7 @@ import Holdings from "../pages/Holdings/Holdings";
 import Positions from "../pages/Positions/Positions";
 import Funds from "../pages/Funds/Funds";
 import Profile from "../pages/Profile/Profile";
+import TradeLab from "../pages/TradeLab/TradeLab";
 
 import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup/Signup";
@@ -38,6 +39,7 @@ export default function AppRoutes() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/holdings" element={<Holdings />} />
           <Route path="/positions" element={<Positions />} />
+          <Route path="/trade-lab" element={<TradeLab />} />
           <Route path="/funds" element={<Funds />} />
           <Route path="/profile" element={<Profile />} />
 
