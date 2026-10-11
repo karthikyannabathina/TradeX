@@ -1,0 +1,292 @@
+.trade-lab {
+  color: #e5e7eb;
+  padding: 28px;
+}
+
+.trade-lab-header,
+.trade-lab-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.trade-lab-header {
+  margin-bottom: 26px;
+}
+
+.trade-lab-eyebrow {
+  color: #22c55e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.trade-lab-header h1 {
+  margin: 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.trade-lab-header p,
+.trade-lab-panel-heading span {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.trade-lab-badge,
+.trade-lab-market-tag {
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.trade-lab-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+  background: #111827;
+  border: 1px solid #263244;
+  border-radius: 12px;
+}
+
+.trade-lab-filters label,
+.trade-lab-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 130px;
+  flex: 1;
+}
+
+.trade-lab label > span {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.trade-lab input,
+.trade-lab select {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 11px;
+  color: #e5e7eb;
+  background: #0b1220;
+  border: 1px solid #334155;
+  border-radius: 7px;
+  outline: none;
+}
+
+.trade-lab input:focus,
+.trade-lab select:focus {
+  border-color: #22c55e;
+}
+
+.trade-lab-load,
+.trade-lab-simulate {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.trade-lab-load {
+  color: #052e16;
+  background: #22c55e;
+}
+
+.trade-lab-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+}
+
+.trade-lab-panel {
+  min-width: 0;
+  padding: 20px;
+  background: #111827;
+  border: 1px solid #263244;
+  border-radius: 12px;
+}
+
+.trade-lab-panel-heading {
+  margin-bottom: 20px;
+}
+
+.trade-lab-panel-heading h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.trade-lab-chart-placeholder {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #334155;
+  border-radius: 9px;
+  background: #0b1220;
+  text-align: center;
+}
+
+.trade-lab-chart-icon {
+  color: #22c55e;
+  font-size: 42px;
+}
+
+.trade-lab-chart-placeholder h3 {
+  margin: 10px 0 4px;
+  font-size: 15px;
+}
+
+.trade-lab-chart-placeholder p,
+.trade-lab-note {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.trade-lab-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.trade-lab-simulate {
+  color: #94a3b8;
+  background: #263244;
+  cursor: not-allowed;
+}
+
+.trade-lab-note {
+  margin: -10px 0 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .trade-lab-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .trade-lab {
+    padding: 16px;
+  }
+
+  .trade-lab-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .trade-lab-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .trade-lab-filters label {
+    width: 100%;
+  }
+}
+
+.trade-lab-load:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.trade-lab-error {
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  color: #fca5a5;
+  background: #450a0a;
+  border: 1px solid #7f1d1d;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.trade-lab-chart-canvas {
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+}
+
+.trade-lab-chart-status {
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.trade-lab-chart-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.trade-lab-simulate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.trade-lab-results {
+  padding: 16px;
+  border: 1px solid #334155;
+  border-radius: 9px;
+  background: #0b1220;
+}
+
+.trade-lab-results h3 {
+  margin: 0 0 14px;
+  font-size: 15px;
+}
+
+.trade-lab-result-row,
+.trade-lab-result-pnl {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #1e293b;
+  font-size: 12px;
+}
+
+.trade-lab-result-row span,
+.trade-lab-result-pnl span {
+  color: #94a3b8;
+}
+
+.trade-lab-result-row strong {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.trade-lab-result-pnl {
+  margin-top: 8px;
+  border-bottom: 0;
+}
+
+.trade-lab-result-pnl strong {
+  font-size: 17px;
+}
+
+.trade-lab-result-pnl .profit {
+  color: #22c55e;
+}
+
+.trade-lab-result-pnl .loss {
+  color: #ef4444;
+}
