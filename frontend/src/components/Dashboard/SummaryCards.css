@@ -1,36 +1,39 @@
+/* =========================================================
+   SUMMARY GRID
+========================================================= */
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 
   width: 100%;
-
-  border: 1px solid #1d2530;
-  border-radius: 8px;
-
-  overflow: hidden;
-
-  background: #0b1017;
+  gap: 12px;
 }
+
+
+/* =========================================================
+   SUMMARY CARD
+========================================================= */
 
 .summary-card {
   min-width: 0;
-  min-height: 118px;
+  min-height: 124px;
 
   padding: 20px 22px;
 
+  border: 1px solid #1d2733;
+  border-radius: 9px;
+
   background: #0b1017;
 
-  border-right: 1px solid #1d2530;
-
-  transition: background 0.15s ease;
-}
-
-.summary-card:last-child {
-  border-right: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .summary-card:hover {
-  background: #0e141c;
+  border-color: #283545;
+  background: #0d131b;
 }
 
 
@@ -41,12 +44,12 @@
 .summary-card h4 {
   margin: 0;
 
-  color: #697589;
+  color: #718096;
 
   font-size: 10px;
   font-weight: 700;
 
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -56,15 +59,17 @@
 ========================================================= */
 
 .summary-card h2 {
-  margin: 14px 0 7px;
+  margin: 15px 0 8px;
 
-  color: #f1f5f9;
+  color: #f3f6fa;
 
-  font-size: 24px;
+  font-size: 26px;
   line-height: 1;
 
   font-weight: 700;
-  letter-spacing: -0.6px;
+  letter-spacing: -0.7px;
+
+  white-space: nowrap;
 }
 
 
@@ -77,7 +82,7 @@
 
   margin: 0;
 
-  color: #10b981;
+  color: #7b8797;
 
   font-size: 11px;
   font-weight: 600;
@@ -85,28 +90,29 @@
 
 
 /* =========================================================
+   POSITIVE / NEGATIVE
+========================================================= */
+
+.summary-card .positive {
+  color: #10b981;
+}
+
+.summary-card .negative {
+  color: #ef5350;
+}
+
+
+/* =========================================================
    TABLET
 ========================================================= */
 
-@media (max-width: 800px) {
+@media (max-width: 1000px) {
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .summary-card:nth-child(2) {
-    border-right: none;
-  }
-
-  .summary-card:nth-child(-n + 2) {
-    border-bottom: 1px solid #1d2530;
-  }
-
-  .summary-card:nth-child(3) {
-    border-right: 1px solid #1d2530;
-  }
-
-  .summary-card:nth-child(4) {
-    border-right: none;
+  .summary-card {
+    min-height: 118px;
   }
 }
 
@@ -118,42 +124,28 @@
 @media (max-width: 600px) {
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    border-radius: 7px;
+    gap: 8px;
   }
 
   .summary-card {
-    min-height: 88px;
+    min-height: 96px;
+
     padding: 15px 14px;
-  }
 
-  .summary-card:nth-child(2) {
-    border-right: none;
-  }
-
-  .summary-card:nth-child(3) {
-    border-right: 1px solid #1d2530;
-    border-bottom: none;
-  }
-
-  .summary-card:nth-child(4) {
-    border-right: none;
-    border-bottom: none;
+    border-radius: 8px;
   }
 
   .summary-card h4 {
     font-size: 8px;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
   }
 
   .summary-card h2 {
-    margin-top: 10px;
+    margin-top: 11px;
     margin-bottom: 6px;
 
-    font-size: 17px;
-    letter-spacing: -0.3px;
-
-    white-space: nowrap;
+    font-size: 18px;
+    letter-spacing: -0.4px;
   }
 
   .summary-card p {
@@ -167,13 +159,17 @@
 ========================================================= */
 
 @media (max-width: 380px) {
+  .summary-grid {
+    gap: 7px;
+  }
+
   .summary-card {
-    min-height: 84px;
-    padding: 14px 12px;
+    min-height: 90px;
+    padding: 13px 12px;
   }
 
   .summary-card h2 {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .summary-card h4 {
