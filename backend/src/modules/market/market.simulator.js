@@ -8,6 +8,10 @@ const {
   emitPriceUpdated,
 } = require("../../events/market.events");
 
+const {
+  redisClient,
+  isRedisReady,
+} = require("../../config/redis");
 
 /* =========================================================
    MARKET CONFIG
@@ -26,20 +30,17 @@ const MAX_STEP_PERCENT = 0.06;
 const CANDLE_INTERVAL_SECONDS = 60;
 const MAX_CANDLES = 240;
 
-
 /* =========================================================
    CANDLE STORAGE
 ========================================================= */
 
 const candleHistory = new Map();
 
-
 /* =========================================================
    DUMMY NSE / BSE STOCKS
 ========================================================= */
 
 const DUMMY_STOCKS = [
-
   {
     symbol: "NIFTY50",
     name: "NIFTY 50",
@@ -143,9 +144,7 @@ const DUMMY_STOCKS = [
     currentPrice: 984.15,
     previousClose: 978.5,
   },
-
 ].map((stock) => ({
-
   ...stock,
 
   dayOpen: stock.currentPrice,
@@ -157,9 +156,7 @@ const DUMMY_STOCKS = [
   volume: 100000,
 
   isActive: true,
-
 }));
-
 
 /* =========================================================
    MARKET STATE
@@ -171,6 +168,53 @@ let isTickRunning = false;
 
 let tickNumber = 0;
 
+/* =========================================================
+   SAFE REDIS MARKET PERSISTENCE
+========================================================= */
+
+/*
+  Redis is used as a persistence/cache layer for live market data.
+
+  Important:
+  A temporary Redis disconnect should NOT stop the market
+  simulator or crash the backend.
+
+  Socket.IO still receives live prices even when Redis is
+  temporarily unavailable.
+*/
+
+let redisWarningShown = false;
+
+const saveMarketStateSafely = async (stock) => {
+  if (!redisClient.isOpen || !isRedisReady()) {
+    if (!redisWarningShown) {
+      console.warn(
+        "⚠️ Redis is not ready. Market persistence temporarily paused."
+      );
+
+      redisWarningShown = true;
+    }
+
+    return;
+  }
+
+  try {
+    await saveMarketState(stock);
+
+    redisWarningShown = false;
+  } catch (error) {
+    console.warn(
+      `⚠️ Redis market update failed for ${stock.symbol}: ${error.message}`
+    );
+
+    /*
+      Do not throw.
+
+      The market simulator must continue running even if
+      Redis temporarily resets the connection.
+    */
+  }
+};
 
 /* =========================================================
    CANDLE TIME
@@ -179,15 +223,12 @@ let tickNumber = 0;
 const getCandleTime = (
   timestamp = Date.now()
 ) => {
-
   return (
     Math.floor(
       timestamp / 1000 / CANDLE_INTERVAL_SECONDS
     ) * CANDLE_INTERVAL_SECONDS
   );
-
 };
-
 
 /* =========================================================
    RANDOM MARKET MOVEMENT
@@ -208,16 +249,13 @@ const getCandleTime = (
 */
 
 const getRandomMovement = () => {
-
   const random =
     Math.random() * 2 - 1;
 
   return (
     random * MAX_STEP_PERCENT
   );
-
 };
-
 
 /* =========================================================
    INITIAL HISTORICAL CANDLES
@@ -226,7 +264,6 @@ const getRandomMovement = () => {
 const createInitialCandles = (
   stock
 ) => {
-
   const candles = [];
 
   const now = Date.now();
@@ -234,13 +271,11 @@ const createInitialCandles = (
   let price =
     Number(stock.currentPrice);
 
-
   for (
     let i = 120;
     i >= 0;
     i--
   ) {
-
     const time =
       getCandleTime(
         now -
@@ -248,7 +283,6 @@ const createInitialCandles = (
           CANDLE_INTERVAL_SECONDS *
           1000
       );
-
 
     /*
       Random historical movement.
@@ -264,10 +298,8 @@ const createInitialCandles = (
         0.35
       ) / 100;
 
-
     const open =
       price;
-
 
     const close =
       Number(
@@ -276,7 +308,6 @@ const createInitialCandles = (
           (1 + movement)
         ).toFixed(2)
       );
-
 
     /*
       Candle high.
@@ -300,7 +331,6 @@ const createInitialCandles = (
         ).toFixed(2)
       );
 
-
     /*
       Candle low.
 
@@ -323,9 +353,7 @@ const createInitialCandles = (
         ).toFixed(2)
       );
 
-
     candles.push({
-
       time,
 
       open:
@@ -344,9 +372,7 @@ const createInitialCandles = (
         Math.floor(
           Math.random() * 40000
         ),
-
     });
-
 
     /*
       Next candle starts from
@@ -354,22 +380,16 @@ const createInitialCandles = (
     */
 
     price = close;
-
   }
 
-
   candleHistory.set(
-
     stock.symbol,
 
     candles.slice(
       -MAX_CANDLES
     )
-
   );
-
 };
-
 
 /* =========================================================
    UPDATE CURRENT CANDLE
@@ -378,39 +398,31 @@ const createInitialCandles = (
 const updateCandle = (
   stock
 ) => {
-
   const symbol =
     stock.symbol;
-
 
   if (
     !candleHistory.has(
       symbol
     )
   ) {
-
     createInitialCandles(
       stock
     );
-
   }
-
 
   const candles =
     candleHistory.get(
       symbol
     );
 
-
   const time =
     getCandleTime();
-
 
   let currentCandle =
     candles[
       candles.length - 1
     ];
-
 
   /* -------------------------------------------------------
      CREATE NEW 1-MINUTE CANDLE
@@ -420,15 +432,12 @@ const updateCandle = (
     !currentCandle ||
     currentCandle.time !== time
   ) {
-
     const price =
       Number(
         stock.currentPrice.toFixed(2)
       );
 
-
     currentCandle = {
-
       time,
 
       open: price,
@@ -440,26 +449,19 @@ const updateCandle = (
       close: price,
 
       volume: 0,
-
     };
-
 
     candles.push(
       currentCandle
     );
 
-
     if (
       candles.length >
       MAX_CANDLES
     ) {
-
       candles.shift();
-
     }
-
   }
-
 
   /* -------------------------------------------------------
      UPDATE CURRENT CANDLE
@@ -470,32 +472,24 @@ const updateCandle = (
       stock.currentPrice.toFixed(2)
     );
 
-
   currentCandle.close =
     price;
 
-
   currentCandle.high =
     Number(
-
       Math.max(
         currentCandle.high,
         price
       ).toFixed(2)
-
     );
-
 
   currentCandle.low =
     Number(
-
       Math.min(
         currentCandle.low,
         price
       ).toFixed(2)
-
     );
-
 
   /*
     Variable volume.
@@ -510,14 +504,11 @@ const updateCandle = (
       Math.random() * 250
     );
 
-
   candleHistory.set(
     symbol,
     candles
   );
-
 };
-
 
 /* =========================================================
    HISTORICAL CANDLES API
@@ -527,47 +518,31 @@ const getHistoricalCandles = (
   symbol,
   range = "1D"
 ) => {
-
   const candles =
     candleHistory.get(
       symbol.toUpperCase()
     );
 
-
   if (!candles) {
-
     return [];
-
   }
 
-
   const limits = {
-
     "1D": 78,
-
     "1W": 120,
-
     "1M": 240,
-
     "3M": 240,
-
     "1Y": 240,
-
     "ALL": 240,
-
   };
-
 
   const limit =
     limits[range] || 78;
 
-
   return candles.slice(
     -limit
   );
-
 };
-
 
 /* =========================================================
    MARKET PAYLOAD
@@ -576,18 +551,15 @@ const getHistoricalCandles = (
 const toMarketPayload = (
   stock
 ) => {
-
   const price =
     Number(
       stock.currentPrice.toFixed(2)
     );
 
-
   const previousPrice =
     Number(
       stock.previousClose.toFixed(2)
     );
-
 
   const change =
     Number(
@@ -597,10 +569,8 @@ const toMarketPayload = (
       ).toFixed(2)
     );
 
-
   const changePercent =
     previousPrice
-
       ? Number(
           (
             (
@@ -610,12 +580,9 @@ const toMarketPayload = (
             100
           ).toFixed(2)
         )
-
       : 0;
 
-
   return {
-
     symbol:
       stock.symbol,
 
@@ -668,11 +635,8 @@ const toMarketPayload = (
 
     volume:
       stock.volume,
-
   };
-
 };
-
 
 /* =========================================================
    ENSURE DUMMY STOCKS
@@ -681,7 +645,6 @@ const toMarketPayload = (
 const ensureDummyStocks = async (
   stocks
 ) => {
-
   const existingSymbols =
     new Set(
       stocks.map(
@@ -689,7 +652,6 @@ const ensureDummyStocks = async (
           stock.symbol
       )
     );
-
 
   const missingStocks =
     DUMMY_STOCKS.filter(
@@ -699,28 +661,22 @@ const ensureDummyStocks = async (
         )
     );
 
-
   if (
     missingStocks.length > 0
   ) {
-
     await Stock.insertMany(
       missingStocks,
       {
         ordered: false,
       }
     );
-
   }
-
 
   return [
     ...stocks,
     ...missingStocks,
   ];
-
 };
-
 
 /* =========================================================
    INITIALIZE MARKET
@@ -728,27 +684,22 @@ const ensureDummyStocks = async (
 
 const initializeMarket =
   async () => {
-
     const existingStocks =
       await Stock.find({
         isActive: true,
       });
-
 
     const stocks =
       await ensureDummyStocks(
         existingStocks
       );
 
-
     for (
       const stock of stocks
     ) {
-
       marketState.set(
         stock.symbol,
         {
-
           symbol:
             stock.symbol,
 
@@ -775,51 +726,38 @@ const initializeMarket =
 
           volume:
             stock.volume,
-
         }
       );
-
 
       createInitialCandles(
         stock
       );
-
     }
-
 
     console.log(
       `📈 Market initialized with ${marketState.size} stocks`
     );
-
   };
-
 
 /* =========================================================
    MARKET TICK
 ========================================================= */
 
 const tick = async () => {
-
   if (
     isTickRunning
   ) {
-
     return;
-
   }
-
 
   isTickRunning = true;
 
   tickNumber += 1;
 
-
   try {
-
     for (
       const stock of marketState.values()
     ) {
-
       /*
         IMPORTANT:
 
@@ -840,10 +778,8 @@ const tick = async () => {
       const movementPercent =
         getRandomMovement();
 
-
       const newPrice =
         Number(
-
           Math.max(
             0.01,
 
@@ -853,15 +789,11 @@ const tick = async () => {
                 movementPercent /
                   100
               )
-
           ).toFixed(2)
-
         );
-
 
       stock.currentPrice =
         newPrice;
-
 
       /* ---------------------------------------------------
          DAY HIGH
@@ -871,12 +803,9 @@ const tick = async () => {
         newPrice >
         stock.dayHigh
       ) {
-
         stock.dayHigh =
           newPrice;
-
       }
-
 
       /* ---------------------------------------------------
          DAY LOW
@@ -886,12 +815,9 @@ const tick = async () => {
         newPrice <
         stock.dayLow
       ) {
-
         stock.dayLow =
           newPrice;
-
       }
-
 
       /* ---------------------------------------------------
          MARKET VOLUME
@@ -903,7 +829,6 @@ const tick = async () => {
           Math.random() * 250
         );
 
-
       /* ---------------------------------------------------
          CANDLE
       --------------------------------------------------- */
@@ -912,15 +837,21 @@ const tick = async () => {
         stock
       );
 
-
       /* ---------------------------------------------------
          REDIS
       --------------------------------------------------- */
 
-      await saveMarketState(
+      /*
+        Redis persistence is deliberately isolated
+        from the live market loop.
+
+        If Redis temporarily disconnects, the market
+        price and Socket.IO updates continue normally.
+      */
+
+      await saveMarketStateSafely(
         stock
       );
-
 
       /* ---------------------------------------------------
          SOCKET.IO
@@ -931,18 +862,12 @@ const tick = async () => {
           stock
         )
       );
-
     }
-
   } finally {
-
     isTickRunning =
       false;
-
   }
-
 };
-
 
 /* =========================================================
    START SIMULATOR
@@ -950,19 +875,15 @@ const tick = async () => {
 
 const startMarketSimulator =
   () => {
-
     setInterval(
       tick,
       TICK_INTERVAL_MS
     );
 
-
     console.log(
       `📊 Market simulator started (${marketState.size} stocks)`
     );
-
   };
-
 
 /* =========================================================
    GET MARKET STATE
@@ -970,22 +891,18 @@ const startMarketSimulator =
 
 const getMarketState =
   () => {
-
     return Array.from(
       marketState.values()
     ).map(
       toMarketPayload
     );
-
   };
-
 
 /* =========================================================
    EXPORTS
 ========================================================= */
 
 module.exports = {
-
   initializeMarket,
 
   startMarketSimulator,
